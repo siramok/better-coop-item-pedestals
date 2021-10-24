@@ -155,6 +155,11 @@ function evaluateRoom() {
   const roomData = v.floorData.get(v.roomIndex);
   if (roomData === undefined) {
     const newRoomData = new RoomData();
+    if (isBossRoom && v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+      for (const entity of entities) {
+        rerollActiveToPassive(entity);
+      }
+    }
     for (const entity of entities) {
       if (isQuestCollectible(entity.SubType) && !isBossRoom) {
         return;
@@ -301,6 +306,9 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
           return;
         }
         if (roomData.getNumToSpawnAt(gridIndex) > 0) {
+          if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+            rerollActiveToPassive(entity);
+          }
           roomData.decrementNumToSpawnAt(gridIndex);
         } else if (roomData.getVoidedAt(gridIndex)) {
           if (entity.SubType !== CollectibleType.COLLECTIBLE_NULL) {
@@ -323,6 +331,9 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
           const poolType = pool.GetPoolForRoom(roomType, Random());
           const nextItem = pool.GetCollectible(poolType);
           changeCollectibleSubType(collectible, nextItem);
+          if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+            rerollActiveToPassive(entity);
+          }
           const collectibleSprite = collectible.GetSprite();
           collectibleSprite.Play(CollectibleAnimation.IDLE, false);
           roomData.decrementNumToSpawnAt(gridIndex);
