@@ -122,21 +122,19 @@ function preEvaluateRoom() {
     return;
   }
   v.bossRewardSpawned = false;
-  if (room.IsFirstVisit()) {
-    v.roomNumItemsToSpawn = getNumItemsToSpawn(isBossRoom);
-    if (v.roomNumItemsToSpawn > 0) {
-      if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
-        const entities = Isaac.FindByType(
-          EntityType.ENTITY_PICKUP,
-          PickupVariant.PICKUP_COLLECTIBLE,
-        );
-        for (const entity of entities) {
-          rerollActiveToPassive(entity);
-        }
+  v.roomNumItemsToSpawn = getNumItemsToSpawn(isBossRoom);
+  if (v.roomNumItemsToSpawn > 0) {
+    if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+      const entities = Isaac.FindByType(
+        EntityType.ENTITY_PICKUP,
+        PickupVariant.PICKUP_COLLECTIBLE,
+      );
+      for (const entity of entities) {
+        rerollActiveToPassive(entity);
       }
-    } else {
-      v.evaluate = false;
     }
+  } else {
+    v.evaluate = false;
   }
 }
 
