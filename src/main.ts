@@ -340,11 +340,11 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
             return;
           }
           const pool = game.GetItemPool();
-          const poolType = pool.GetPoolForRoom(roomType, Random());
-          let nextItem = pool.GetCollectible(poolType);
-          while (nextItem === CollectibleType.COLLECTIBLE_NULL) {
-            nextItem = pool.GetCollectible(poolType);
+          let poolType = pool.GetPoolForRoom(roomType, Random());
+          if (poolType === ItemPoolType.POOL_NULL) {
+            poolType = ItemPoolType.POOL_TREASURE;
           }
+          const nextItem = pool.GetCollectible(poolType);
           changeCollectibleSubType(collectible, nextItem);
           if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
             rerollItemIfActive(entity, roomData.getHiddenAt(gridIndex));

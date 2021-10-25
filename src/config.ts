@@ -127,7 +127,7 @@ if (ModConfigMenu !== undefined) {
   addMcmSetting("Modes", DIFFICULTY_CHALLENGE, "Challenges", "");
 
   // Rooms tab
-  addMcmSetting("Rooms", RoomType.ROOM_DEFAULT, "Normal rooms", "");
+  addMcmSetting("Rooms", RoomType.ROOM_DEFAULT, "Default rooms", "");
   addMcmSetting("Rooms", RoomType.ROOM_TREASURE, "Treasure rooms", "");
   addMcmSetting("Rooms", RoomType.ROOM_PLANETARIUM, "Planetarium rooms", "");
   addMcmSetting("Rooms", RoomType.ROOM_CURSE, "Curse rooms", "");

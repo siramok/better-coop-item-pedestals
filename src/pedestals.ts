@@ -27,12 +27,12 @@ export function rerollItemIfActive(
   const room = game.GetRoom();
   const roomType = room.GetType();
   const pool = game.GetItemPool();
-  const poolType = pool.GetPoolForRoom(roomType, Random());
+  let poolType = pool.GetPoolForRoom(roomType, Random());
+  if (poolType === ItemPoolType.POOL_NULL) {
+    poolType = ItemPoolType.POOL_TREASURE;
+  }
   while (itemConfigItem.Type === ItemType.ITEM_ACTIVE) {
-    let nextItem = pool.GetCollectible(poolType);
-    while (nextItem === CollectibleType.COLLECTIBLE_NULL) {
-      nextItem = pool.GetCollectible(poolType);
-    }
+    const nextItem = pool.GetCollectible(poolType);
     changeCollectibleSubType(collectible, nextItem);
     itemConfigItem = itemConfig.GetCollectible(collectible.SubType);
     if (itemConfigItem === undefined) {
