@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { hasBlindSprite, isBlindCurseActive } from "../blindCurse";
+import { isBlindCurseActive, isBlindCurseSprite } from "../blindCurse";
 
 // Represents persistent entity data at a given grid index
 export default class EntityData {
@@ -12,7 +12,7 @@ export default class EntityData {
   constructor(entity: Entity, numToSpawn: int) {
     if (!isBlindCurseActive()) {
       const entitySprite = entity.GetSprite();
-      this._hidden = hasBlindSprite(entitySprite);
+      this._hidden = isBlindCurseSprite(entitySprite);
     }
     this._numToSpawn = numToSpawn;
     const collectible = entity.ToPickup();

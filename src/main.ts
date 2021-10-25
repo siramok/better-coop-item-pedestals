@@ -14,7 +14,7 @@ import {
   upgradeMod,
 } from "isaacscript-common";
 import { DIFFICULTY_CHALLENGE, TweakType, v } from "./config";
-import { rerollActiveToPassive, spawnPedestal } from "./pedestals";
+import { rerollItemIfActive, spawnPedestal } from "./pedestals";
 import RoomData from "./types/RoomData";
 
 // Register and upgrade the mod
@@ -130,7 +130,9 @@ function preEvaluateRoom() {
         PickupVariant.PICKUP_COLLECTIBLE,
       );
       for (const entity of entities) {
-        rerollActiveToPassive(entity);
+        if (entity.SubType !== CollectibleType.COLLECTIBLE_NULL) {
+          rerollItemIfActive(entity);
+        }
       }
     }
   } else {
@@ -145,7 +147,8 @@ function evaluateRoom() {
   }
   const game = Game();
   const room = game.GetRoom();
-  const isBossRoom = room.GetType() === RoomType.ROOM_BOSS;
+  const roomType = room.GetType();
+  const isBossRoom = roomType === RoomType.ROOM_BOSS;
   const entities = Isaac.FindByType(
     EntityType.ENTITY_PICKUP,
     PickupVariant.PICKUP_COLLECTIBLE,
@@ -153,23 +156,15 @@ function evaluateRoom() {
   const roomData = v.floorData.get(v.roomIndex);
   if (roomData === undefined) {
     const newRoomData = new RoomData();
-    if (isBossRoom && v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
-      for (const entity of entities) {
-        rerollActiveToPassive(entity);
-      }
-    }
     for (const entity of entities) {
       if (isQuestCollectible(entity.SubType) && !isBossRoom) {
         return;
       }
       const gridIndex = room.GetClampedGridIndex(entity.Position);
       newRoomData.addEntityAt(gridIndex, entity, v.roomNumItemsToSpawn);
-      if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
-        if (newRoomData.getHiddenAt(gridIndex)) {
-          const collectible = entity.ToPickup();
-          if (collectible !== undefined) {
-            setCollectibleBlind(collectible);
-          }
+      if (newRoomData.getNumToSpawnAt(gridIndex) > 0) {
+        if (isBossRoom && v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+          rerollItemIfActive(entity, newRoomData.getHiddenAt(gridIndex));
         }
       }
     }
@@ -181,6 +176,9 @@ function evaluateRoom() {
     for (const entity of entities) {
       const gridIndex = room.GetClampedGridIndex(entity.Position);
       if (!roomData.entityExistsAt(gridIndex)) {
+        if (isQuestCollectible(entity.SubType) && !isBossRoom) {
+          return;
+        }
         roomData.addEntityAt(gridIndex, entity, v.roomNumItemsToSpawn);
       }
     }
@@ -199,18 +197,21 @@ function evaluateRoomNextFrame() {
   });
 }
 
-// Handles delayed room evaluation (since boss room pedestals only spawn after the boss is killed)
+// Handles delayed room evaluation (for rooms that spawn pedestals after enemies are cleared)
 function preSpawnCleanAward() {
-  const game = Game();
-  const room = game.GetRoom();
-  const roomType = room.GetType();
-  if (roomType === RoomType.ROOM_BOSS) {
-    v.bossRewardSpawned = true;
+  const roomData = v.floorData.get(v.roomIndex);
+  if (roomData === undefined) {
+    const game = Game();
+    const room = game.GetRoom();
+    const roomType = room.GetType();
+    if (roomType === RoomType.ROOM_BOSS) {
+      v.bossRewardSpawned = true;
+    }
     evaluateRoomNextFrame();
   }
 }
 
-// Reevaluate all player active items (performed the frame after item use)
+// Reevaluate all player active items next frame
 function evaluateActivesNextFrame() {
   runNextFrame(() => {
     const players = getPlayers(true);
@@ -236,11 +237,24 @@ function handleVoidAbyss() {
     if (isBossRoom && v.tweaks.has(TweakType.DISABLE_BOSS)) {
       return;
     }
-    const entityDataMap = roomData.entities;
-    const entityDataIterator = entityDataMap.entries();
-    for (const [gridIndex, entityData] of entityDataIterator) {
-      if (entityData.numToSpawn > 0) {
-        spawnPedestal(entityData);
+    const entities = Isaac.FindByType(
+      EntityType.ENTITY_PICKUP,
+      PickupVariant.PICKUP_COLLECTIBLE,
+    );
+    for (const entity of entities) {
+      const gridIndex = room.GetClampedGridIndex(entity.Position);
+      if (roomData.getNumToSpawnAt(gridIndex) > 0) {
+        const entityData = roomData.getEntityDataAt(gridIndex);
+        if (entityData === undefined) {
+          break;
+        }
+        const pedestal = spawnPedestal(entityData);
+        if (pedestal === undefined) {
+          break;
+        }
+        if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
+          rerollItemIfActive(pedestal, roomData.getHiddenAt(gridIndex));
+        }
         roomData.setVoidedAt(gridIndex);
         roomData.decrementNumToSpawnAt(gridIndex);
       }
@@ -305,7 +319,7 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
         }
         if (roomData.getNumToSpawnAt(gridIndex) > 0) {
           if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
-            rerollActiveToPassive(entity);
+            rerollItemIfActive(entity, roomData.getHiddenAt(gridIndex));
           }
           roomData.decrementNumToSpawnAt(gridIndex);
         } else if (roomData.getVoidedAt(gridIndex)) {
@@ -327,10 +341,15 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
           }
           const pool = game.GetItemPool();
           const poolType = pool.GetPoolForRoom(roomType, Random());
-          const nextItem = pool.GetCollectible(poolType);
+          let nextItem = pool.GetCollectible(poolType);
+          while (nextItem === CollectibleType.COLLECTIBLE_NULL) {
+            nextItem = pool.GetCollectible(poolType);
+          }
           changeCollectibleSubType(collectible, nextItem);
           if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
-            rerollActiveToPassive(entity);
+            rerollItemIfActive(entity, roomData.getHiddenAt(gridIndex));
+          } else if (roomData.getHiddenAt(gridIndex)) {
+            setCollectibleBlind(collectible);
           }
           const collectibleSprite = collectible.GetSprite();
           collectibleSprite.Play(CollectibleAnimation.IDLE, false);

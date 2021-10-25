@@ -37,6 +37,10 @@ export default class RoomData {
     return entityData !== undefined;
   }
 
+  public getEntityDataAt(gridIndex: int): EntityData | undefined {
+    return this._entities.get(gridIndex);
+  }
+
   public getHiddenAt(gridIndex: int): boolean {
     const entityData = this._entities.get(gridIndex);
     if (entityData !== undefined) {

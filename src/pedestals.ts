@@ -2,13 +2,21 @@ import {
   changeCollectibleSubType,
   setCollectibleBlind,
 } from "isaacscript-common";
+import { isBlindCurseSprite } from "./blindCurse";
 import EntityData from "./types/EntityData";
 
 // Rerolls active items to passive items
-export function rerollActiveToPassive(entity: Entity): void {
+export function rerollItemIfActive(
+  entity: Entity,
+  isHidden?: boolean | undefined,
+): void {
   const collectible = entity.ToPickup();
   if (collectible === undefined) {
     return;
+  }
+  const collectibleSprite = collectible.GetSprite();
+  if (isHidden === undefined) {
+    isHidden = isBlindCurseSprite(collectibleSprite);
   }
   const itemConfig = Isaac.GetItemConfig();
   let itemConfigItem = itemConfig.GetCollectible(collectible.SubType);
@@ -21,12 +29,18 @@ export function rerollActiveToPassive(entity: Entity): void {
   const pool = game.GetItemPool();
   const poolType = pool.GetPoolForRoom(roomType, Random());
   while (itemConfigItem.Type === ItemType.ITEM_ACTIVE) {
-    const nextItem = pool.GetCollectible(poolType);
+    let nextItem = pool.GetCollectible(poolType);
+    while (nextItem === CollectibleType.COLLECTIBLE_NULL) {
+      nextItem = pool.GetCollectible(poolType);
+    }
     changeCollectibleSubType(collectible, nextItem);
     itemConfigItem = itemConfig.GetCollectible(collectible.SubType);
     if (itemConfigItem === undefined) {
-      return;
+      break;
     }
+  }
+  if (isHidden) {
+    setCollectibleBlind(collectible);
   }
 }
 

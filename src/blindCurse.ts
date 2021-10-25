@@ -5,17 +5,24 @@ blindSprite.ReplaceSpritesheet(1, "gfx/items/collectibles/questionmark.png");
 blindSprite.LoadGraphics();
 
 // Returns true if the pedestal sprite is hidden, false otherwise
-export function hasBlindSprite(entitySprite: Sprite): boolean {
-  blindSprite.SetFrame(entitySprite.GetAnimation(), entitySprite.GetFrame());
-  for (let i = -31; i < -13; i++) {
-    const entityColor = entitySprite.GetTexel(Vector(0, i), Vector.Zero, 1);
-    const blindColor = blindSprite.GetTexel(Vector(0, i), Vector.Zero, 1);
-    if (
-      entityColor.Red !== blindColor.Red ||
-      entityColor.Green !== blindColor.Green ||
-      entityColor.Blue !== blindColor.Blue
-    ) {
-      return false;
+export function isBlindCurseSprite(sprite: Sprite): boolean {
+  const animation = sprite.GetAnimation();
+  if (animation !== CollectibleAnimation.IDLE) {
+    return false;
+  }
+  const frame = sprite.GetFrame();
+  blindSprite.SetFrame(animation, frame);
+  for (let i = -3; i < 3; i += 2) {
+    for (let j = -31; j < -13; j += 2) {
+      const spriteColor = sprite.GetTexel(Vector(i, j), Vector.Zero, 1);
+      const blindColor = blindSprite.GetTexel(Vector(i, j), Vector.Zero, 1);
+      if (
+        spriteColor.Red !== blindColor.Red ||
+        spriteColor.Green !== blindColor.Green ||
+        spriteColor.Blue !== blindColor.Blue
+      ) {
+        return false;
+      }
     }
   }
   return true;
@@ -26,5 +33,5 @@ export function isBlindCurseActive(): boolean {
   const game = Game();
   const level = game.GetLevel();
   const curses = level.GetCurses();
-  return (curses & 64) === 0;
+  return (curses & 64) !== 0;
 }
