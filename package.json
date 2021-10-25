@@ -1,5 +1,5 @@
 {
-  "name": "bcip",
+  "name": "better-coop-item-pedestals",
   "version": "0.0.1",
   "description": "A mod for The Binding of Isaac: Repentance",
   "keywords": [
@@ -15,8 +15,5 @@
     "isaacscript": "^1.1.26",
     "isaacscript-common": "^1.0.350",
     "isaacscript-lint": "^1.0.63"
-  },
-  "devDependencies": {
-    "eslint": "^8.1.0"
   }
 }
