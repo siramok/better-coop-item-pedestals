@@ -1,8 +1,7 @@
 import {
-  changeCollectibleSubType,
   getPlayerIndex,
   getPlayers,
-  getRoomIndex,
+  getRoomSafeGridIndex,
   isQuestCollectible,
   jsonDecode,
   jsonEncode,
@@ -11,6 +10,7 @@ import {
   removeAllMatchingEntities,
   runNextFrame,
   setCollectibleBlind,
+  setCollectibleSubType,
   upgradeMod,
 } from "isaacscript-common";
 import { DIFFICULTY_CHALLENGE, TweakType, v } from "./config";
@@ -189,7 +189,7 @@ function evaluateRoom() {
 // Resets new room variables and handles room evaluation
 function evaluateRoomNextFrame() {
   v.evaluate = true;
-  v.roomIndex = getRoomIndex();
+  v.roomIndex = getRoomSafeGridIndex();
   v.roomNumItemsToSpawn = 0;
   preEvaluateRoom();
   runNextFrame(() => {
@@ -345,7 +345,7 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
             poolType = ItemPoolType.POOL_TREASURE;
           }
           const nextItem = pool.GetCollectible(poolType);
-          changeCollectibleSubType(collectible, nextItem);
+          setCollectibleSubType(collectible, nextItem);
           if (v.tweaks.has(TweakType.PREVENT_ACTIVES)) {
             rerollItemIfActive(entity, roomData.getHiddenAt(gridIndex));
           } else if (roomData.getHiddenAt(gridIndex)) {
@@ -367,23 +367,25 @@ function loadSettings() {
   if (mod.HasData()) {
     const serialized = Isaac.LoadModData(mod);
     const deserialized = jsonDecode(serialized);
-    if (deserialized.get("version") === v.version) {
+    const savedVersion = deserialized.get("version") as string;
+    if (savedVersion === v.version) {
+      const modes = deserialized.get("modes") as Difficulty[];
       v.modes.clear();
-      for (const mode of deserialized.get("modes")) {
+      for (const mode of modes) {
         v.modes.add(mode);
       }
+      const rooms = deserialized.get("rooms") as RoomType[];
       v.rooms.clear();
-      for (const room of deserialized.get("rooms")) {
+      for (const room of rooms) {
         v.rooms.add(room);
       }
+      const tweaks = deserialized.get("tweaks") as TweakType[];
       v.tweaks.clear();
-      for (const tweak of deserialized.get("tweaks")) {
+      for (const tweak of tweaks) {
         v.tweaks.add(tweak);
       }
-      const spawnOffset: unknown = deserialized.get("spawnOffset");
-      if (typeof spawnOffset === "number") {
-        v.spawnOffset = spawnOffset;
-      }
+      const spawnOffset = deserialized.get("spawnOffset") as number;
+      v.spawnOffset = spawnOffset;
     }
   }
 }

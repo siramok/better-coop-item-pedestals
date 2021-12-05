@@ -1,7 +1,4 @@
-import {
-  changeCollectibleSubType,
-  setCollectibleBlind,
-} from "isaacscript-common";
+import { setCollectibleBlind, setCollectibleSubType } from "isaacscript-common";
 import { isBlindCurseSprite } from "./blindCurse";
 import EntityData from "./types/EntityData";
 
@@ -33,7 +30,7 @@ export function rerollItemIfActive(
   }
   while (itemConfigItem.Type === ItemType.ITEM_ACTIVE) {
     const nextItem = pool.GetCollectible(poolType);
-    changeCollectibleSubType(collectible, nextItem);
+    setCollectibleSubType(collectible, nextItem);
     itemConfigItem = itemConfig.GetCollectible(collectible.SubType);
     if (itemConfigItem === undefined) {
       break;

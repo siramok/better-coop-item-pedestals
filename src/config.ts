@@ -1,4 +1,4 @@
-import { getRoomIndex, PlayerIndex } from "isaacscript-common";
+import { getRoomSafeGridIndex, PlayerIndex } from "isaacscript-common";
 import RoomData from "./types/RoomData";
 
 export const DIFFICULTY_CHALLENGE = 4;
@@ -17,7 +17,7 @@ export const v = {
   evaluate: true,
   floorData: new Map<int, RoomData>(),
   modes: new Set<Difficulty>(),
-  roomIndex: getRoomIndex(),
+  roomIndex: getRoomSafeGridIndex(),
   roomNumItemsToSpawn: 0,
   rooms: new Set<RoomType>(),
   spawnOffset: 0,
