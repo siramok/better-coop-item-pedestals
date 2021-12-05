@@ -22,7 +22,7 @@ export const v = {
   rooms: new Set<RoomType>(),
   spawnOffset: 0,
   tweaks: new Set<TweakType>(),
-  version: "2.0",
+  version: "2.1",
 };
 
 // Apply default config
