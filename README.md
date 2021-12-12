@@ -1,4 +1,4 @@
-# Better Coop Item Pedestals ![Build Status](https://github.com/siramok/better-coop-item-pedestals/actions/workflows/ci.yml/badge.svg)
+# Better Coop Item Pedestals <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=2491785532"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-steam-workshop.jross.me%2F2491785532%2Fsubscriptions-text&style=for-the-badge" alt="Steam Workshop downloads"></a> ![Build Status](https://github.com/siramok/better-coop-item-pedestals/actions/workflows/ci.yml/badge.svg)
 Better Coop Item Pedestals is a mod for *[The Binding of Isaac: Repentance](https://store.steampowered.com/app/1426300/The_Binding_of_Isaac_Repentance)*, written in [TypeScript](https://typescriptlang.org) using the [IsaacScript](https://isaacscript.github.io) framework.
 
 Designed to improve the muliplayer coop experience, this mod changes item pedestals to behave the same as they do in boss rooms: one item spawn per player.
