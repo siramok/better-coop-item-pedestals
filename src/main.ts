@@ -1,14 +1,14 @@
 import {
   getPlayerIndex,
   getPlayers,
-  getRoomSafeGridIndex,
+  getRoomGridIndex,
   isQuestCollectible,
   jsonDecode,
   jsonEncode,
   ModCallbacksCustom,
   PickingUpItem,
   removeAllMatchingEntities,
-  runNextFrame,
+  runNextGameFrame,
   setCollectibleBlind,
   setCollectibleSubType,
   upgradeMod,
@@ -189,10 +189,10 @@ function evaluateRoom() {
 // Resets new room variables and handles room evaluation
 function evaluateRoomNextFrame() {
   v.evaluate = true;
-  v.roomIndex = getRoomSafeGridIndex();
+  v.roomIndex = getRoomGridIndex();
   v.roomNumItemsToSpawn = 0;
   preEvaluateRoom();
-  runNextFrame(() => {
+  runNextGameFrame(() => {
     evaluateRoom();
   });
 }
@@ -213,7 +213,7 @@ function preSpawnCleanAward() {
 
 // Reevaluate all player active items next frame
 function evaluateActivesNextFrame() {
-  runNextFrame(() => {
+  runNextGameFrame(() => {
     const players = getPlayers(true);
     for (const player of players) {
       const playerIndex = getPlayerIndex(player);
@@ -305,8 +305,8 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
     const gridIndex = room.GetClampedGridIndex(entity.Position);
     const roomType = room.GetType();
     if (roomType === RoomType.ROOM_BOSS) {
-      if (item.type === ItemType.ITEM_ACTIVE && playerActive !== 0) {
-        v.activeData.set(playerIndex, item.id);
+      if (item.itemType === ItemType.ITEM_ACTIVE && playerActive !== 0) {
+        v.activeData.set(playerIndex, item.subType);
       } else {
         if (v.tweaks.has(TweakType.DISABLE_BOSS)) {
           removeAllMatchingEntities(
@@ -332,8 +332,8 @@ function preItemPickup(player: EntityPlayer, item: PickingUpItem) {
       const entitySprite = entity.GetSprite();
       const entityAnimation = entitySprite.GetAnimation();
       if (entityAnimation === CollectibleAnimation.EMPTY) {
-        if (item.type === ItemType.ITEM_ACTIVE && playerActive !== 0) {
-          v.activeData.set(playerIndex, item.id);
+        if (item.itemType === ItemType.ITEM_ACTIVE && playerActive !== 0) {
+          v.activeData.set(playerIndex, item.subType);
         } else {
           const collectible = entity.ToPickup();
           if (collectible === undefined) {

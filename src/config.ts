@@ -1,4 +1,4 @@
-import { getRoomSafeGridIndex, PlayerIndex } from "isaacscript-common";
+import { getRoomGridIndex, PlayerIndex } from "isaacscript-common";
 import RoomData from "./types/RoomData";
 
 export const DIFFICULTY_CHALLENGE = 4;
@@ -17,12 +17,12 @@ export const v = {
   evaluate: true,
   floorData: new Map<int, RoomData>(),
   modes: new Set<Difficulty>(),
-  roomIndex: getRoomSafeGridIndex(),
+  roomIndex: getRoomGridIndex(),
   roomNumItemsToSpawn: 0,
   rooms: new Set<RoomType>(),
   spawnOffset: 0,
   tweaks: new Set<TweakType>(),
-  version: "2.1",
+  version: "2.2",
 };
 
 // Apply default config
@@ -107,17 +107,11 @@ function addMcmSetting(
 if (ModConfigMenu !== undefined) {
   // About tab
   ModConfigMenu.AddSpace("Better Coop IP", "About");
-  ModConfigMenu.AddText("Better Coop IP", "About", () => {
-    return "Better Coop Item Pedestals";
-  });
+  ModConfigMenu.AddText("Better Coop IP", "About", () => "Better Coop Item Pedestals");
   ModConfigMenu.AddSpace("Better Coop IP", "About");
-  ModConfigMenu.AddText("Better Coop IP", "About", () => {
-    return `Version ${v.version}`;
-  });
+  ModConfigMenu.AddText("Better Coop IP", "About", () => `Version ${v.version}`);
   ModConfigMenu.AddSpace("Better Coop IP", "About");
-  ModConfigMenu.AddText("Better Coop IP", "About", () => {
-    return "by Siramok";
-  });
+  ModConfigMenu.AddText("Better Coop IP", "About", () => "by Siramok");
 
   // Modes tab
   addMcmSetting("Modes", Difficulty.DIFFICULTY_NORMAL, "Normal mode", "");
@@ -144,14 +138,10 @@ if (ModConfigMenu !== undefined) {
 
   // Tweaks tab
   ModConfigMenu.AddSetting("Better Coop IP", "Tweaks", {
-    CurrentSetting: (): number => {
-      return v.spawnOffset;
-    },
+    CurrentSetting: (): number => v.spawnOffset,
     Maximum: 8,
     Minimum: -3,
-    Display: (): string => {
-      return `Item spawn offset: ${v.spawnOffset}`;
-    },
+    Display: (): string => `Item spawn offset: ${v.spawnOffset}`,
     Info: [],
     OnChange: (currentValue: number | boolean | undefined): void => {
       v.spawnOffset = currentValue as number;
