@@ -107,9 +107,17 @@ function addMcmSetting(
 if (ModConfigMenu !== undefined) {
   // About tab
   ModConfigMenu.AddSpace("Better Coop IP", "About");
-  ModConfigMenu.AddText("Better Coop IP", "About", () => "Better Coop Item Pedestals");
+  ModConfigMenu.AddText(
+    "Better Coop IP",
+    "About",
+    () => "Better Coop Item Pedestals",
+  );
   ModConfigMenu.AddSpace("Better Coop IP", "About");
-  ModConfigMenu.AddText("Better Coop IP", "About", () => `Version ${v.version}`);
+  ModConfigMenu.AddText(
+    "Better Coop IP",
+    "About",
+    () => `Version ${v.version}`,
+  );
   ModConfigMenu.AddSpace("Better Coop IP", "About");
   ModConfigMenu.AddText("Better Coop IP", "About", () => "by Siramok");
 

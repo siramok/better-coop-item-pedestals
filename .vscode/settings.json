@@ -10,6 +10,7 @@
 
   "files.associations": {
     "*.anm2": "xml", // anm2 files are just XML files
+    "*.dat": "json", // Nearly all mods save JSON to the "save#.dat" file
   },
 
   // Linux line endings are used in this project
@@ -33,17 +34,26 @@
   "javascript.suggest.completeFunctionCalls": true,
   "typescript.suggest.completeFunctionCalls": true,
 
-  // Automatically run the formatter when a JavaScript or TypeScript file is saved
+  // Automatically run the formatter when certain files are saved
   "[javascript]": {
     "editor.codeActionsOnSave": [
       "source.fixAll.eslint",
     ],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
     "editor.tabSize": 2,
   },
   "[typescript]": {
     "editor.codeActionsOnSave": [
       "source.fixAll.eslint",
     ],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+  },
+  "[xml]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.formatOnSave": true,
     "editor.tabSize": 2,
   },
 }

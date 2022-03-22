@@ -1,12 +1,12 @@
-# ----
-# Better Coop Item Pedestals
-# ----
+# --------------------------
+# better-coop-item-pedestals
+# --------------------------
 
 # Per-user IsaacScript settings
 isaacscript.json
 
 # The transpiled Lua output
-mod
+mod/main.lua
 
 # MacOS artifacts
 .DS_Store

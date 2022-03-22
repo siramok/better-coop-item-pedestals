@@ -22,7 +22,7 @@ const mod = RegisterMod("Better Coop Item Pedestals", 1);
 const modUpgraded = upgradeMod(mod);
 
 // Register all callbacks
-export default function main(): void {
+export function main(): void {
   // Main callbacks
   mod.AddCallback(ModCallbacks.MC_POST_GAME_STARTED, resetRunVariables);
   mod.AddCallback(ModCallbacks.MC_POST_NEW_LEVEL, resetLevelVariables);
