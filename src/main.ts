@@ -21,6 +21,8 @@ import RoomData from "./types/RoomData";
 const mod = RegisterMod("Better Coop Item Pedestals", 1);
 const modUpgraded = upgradeMod(mod);
 
+const GREED_TREASURE_ROOM_INDEX = 98;
+
 // Register all callbacks
 export function main(): void {
   // Main callbacks
@@ -71,16 +73,25 @@ function resetLevelVariables() {
 // Validates that the current room and game mode are enabled in the mod settings
 function conditionsMet(): boolean {
   const game = Game();
+  const level = game.GetLevel();
+  const mode = game.Difficulty;
   const room = game.GetRoom();
   const roomType = room.GetType();
+  const roomIndex = level.GetCurrentRoomIndex();
   if (!v.rooms.has(roomType)) {
+    return false;
+  }
+  // skip greed treasure room in greed and greedier mode since it spawns an item pedestal per player
+  const isGreedMode =
+    mode === Difficulty.DIFFICULTY_GREED ||
+    mode === Difficulty.DIFFICULTY_GREEDIER;
+  if (isGreedMode && roomIndex === GREED_TREASURE_ROOM_INDEX) {
     return false;
   }
   const isChallenge = game.Challenge !== Challenge.CHALLENGE_NULL;
   if (isChallenge && !v.modes.has(DIFFICULTY_CHALLENGE)) {
     return false;
   }
-  const mode = game.Difficulty;
   if (!isChallenge && !v.modes.has(mode)) {
     return false;
   }
